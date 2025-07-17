@@ -14,6 +14,7 @@ dropdowns.forEach((dropdown) => {
     dropdownLinks[i].addEventListener("click", function (event) {
       event.preventDefault();
       dropdownValue.textContent = dropdownLinks[i].textContent;
+      dropdownList.classList.remove("dropdown__list_active");
     });
   }
 });
