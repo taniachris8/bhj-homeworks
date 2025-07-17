@@ -4,25 +4,28 @@ const form = document.querySelector("form");
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  if (tasksInput.value) {
-    const task = document.createElement("div");
-    task.className = "task";
-    const taskTitle = document.createElement("div");
-    taskTitle.className = "task__title";
+  if (tasksInput.value.trim()) {
+    const title = tasksInput.value.trim();
 
-    taskTitle.textContent = tasksInput.value.trim();
+    tasksList.insertAdjacentHTML(
+      "afterbegin",
+      `
+      <div class="task">
+      <div class="task__title">
+      ${title}
+      </div>
+      <a href="#" class="task__remove">&times;</a>
+      </div>
+      `
+    );
 
-    const removeBtn = document.createElement("a");
-    removeBtn.className = "task__remove";
-    removeBtn.textContent = "x";
-    removeBtn.href = "#";
+    const task = tasksList.querySelector(".task");
+    const removeBtn = task.querySelector(".task__remove");
+
     removeBtn.addEventListener("click", (event) => {
       event.preventDefault();
       task.remove();
     });
-
-    task.append(taskTitle, removeBtn);
-    tasksList.append(task);
   }
   form.reset();
 });
