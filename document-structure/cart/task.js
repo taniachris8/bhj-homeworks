@@ -31,20 +31,15 @@ products.forEach((product) => {
         Number(existingProductValue.textContent) +
         Number(countValue.textContent);
     } else {
-      const cartProduct = document.createElement("div");
-      cartProduct.className = "cart__product";
-      cartProduct.dataset.id = product.dataset.id;
-
-      const cartProductImg = document.createElement("img");
-      cartProductImg.className = "cart__product-image";
-      cartProductImg.src = productImage.src;
-
-      const cartProductValue = document.createElement("div");
-      cartProductValue.className = "cart__product-count";
-      cartProductValue.textContent = countValue.textContent;
-
-      cartProduct.append(cartProductImg, cartProductValue);
-      cartProducts.append(cartProduct);
+      cartProducts.insertAdjacentHTML(
+        "afterbegin",
+        `
+        <div class="cart__product" data-id=${product.dataset.id}>
+          <img class="cart__product-image" src=${productImage.src}>
+          <div class="cart__product-count">${countValue.textContent}</div>
+        </div>
+        `
+      );
     }
   });
 });
