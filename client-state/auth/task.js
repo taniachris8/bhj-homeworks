@@ -4,6 +4,8 @@ const spanUserId = document.querySelector("#user_id");
 const form = document.querySelector("#signin__form");
 
 function createLogoutButton() {
+  if (document.querySelector(".logout-btn")) return;
+
   const logoutBtn = document.createElement("button");
   logoutBtn.className = "logout-btn";
   logoutBtn.style.cssText = `
@@ -21,8 +23,9 @@ function createLogoutButton() {
   const btn = document.querySelector(".logout-btn");
 
   btn.addEventListener("click", () => {
-    localStorage.clear();
-    location.reload();
+    localStorage.removeItem("user_id");
+    welcomeDiv.classList.remove("welcome_active");
+    signin.classList.add("signin_active");
   });
 }
 
@@ -34,48 +37,46 @@ try {
   console.error("Ошибка парсинга JSON:", error);
 }
 
-if (storedId) {
+function showWelcomeUser(userId) {
   signin.classList.remove("signin_active");
   welcomeDiv.classList.add("welcome_active");
-  spanUserId.textContent = storedId;
+  spanUserId.textContent = userId;
+}
+
+if (storedId) {
+  showWelcomeUser(storedId);
   createLogoutButton();
 } else {
   signin.classList.add("signin_active");
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const xhr = new XMLHttpRequest();
-
-    xhr.addEventListener("load", () => {
-      if (xhr.status >= 200 && xhr.status < 400) {
-        try {
-          const data = JSON.parse(xhr.responseText);
-
-          if (data.success) {
-            localStorage.setItem("user_id", JSON.stringify(data.user_id));
-            signin.classList.remove("signin_active");
-            welcomeDiv.classList.add("welcome_active");
-            spanUserId.textContent = data.user_id;
-            createLogoutButton();
-          } else {
-            alert("Неверный логин или пароль");
-          }
-        } catch (error) {
-          console.error("Ошибка парсинга JSON:", error);
-          alert("Ошибка сервера, попробуйте ещё раз позже");
-        }
-      } else {
-        console.error("Ошибка HTTP запроса");
-        alert("Ошибка сервера");
-      }
-    });
-
-    xhr.open("POST", "https://students.netoservices.ru/nestjs-backend/auth");
-
-    const formData = new FormData(form);
-    xhr.send(formData);
-
-    form.reset();
-  });
 }
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const xhr = new XMLHttpRequest();
+
+  xhr.responseType = "json";
+
+  xhr.addEventListener("load", () => {
+    try {
+      if (xhr.response.success) {
+        localStorage.setItem("user_id", JSON.stringify(xhr.response.user_id));
+
+        showWelcomeUser(xhr.response.user_id);
+        createLogoutButton();
+      } else {
+        alert("Неверный логин или пароль");
+      }
+    } catch (error) {
+      console.error("Ошибка парсинга JSON:", error);
+      alert("Ошибка сервера, попробуйте ещё раз позже");
+    }
+  });
+
+  xhr.open("POST", "https://students.netoservices.ru/nestjs-backend/auth");
+
+  const formData = new FormData(form);
+  xhr.send(formData);
+
+  form.reset();
+});
