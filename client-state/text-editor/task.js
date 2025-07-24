@@ -23,6 +23,6 @@ card.append(clearBtn);
 const btn = document.querySelector(".clear-btn");
 
 btn.addEventListener("click", () => {
-  localStorage.clear();
-  location.reload();
+  localStorage.removeItem("value");
+  editor.value = "";
 });
